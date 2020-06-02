@@ -23,14 +23,14 @@ gpxParser.prototype.parse = function (gpxstring) {
     var domParser = new window.DOMParser();
     this.xmlSource = domParser.parseFromString(gpxstring, 'text/xml');
 
-    metadata = this.xmlSource.querySelector('metadata');
-    if(metadata != null){
-        this.metadata.name  = this.getElementValue(metadata, "name");
-        this.metadata.desc  = this.getElementValue(metadata, "desc");
-        this.metadata.time  = this.getElementValue(metadata, "time");
+    this.metadata = this.xmlSource.querySelector('metadata');
+    if(this.metadata != null){
+        this.metadata.name  = this.getElementValue(this.metadata, "name");
+        this.metadata.desc  = this.getElementValue(this.metadata, "desc");
+        this.metadata.time  = this.getElementValue(this.metadata, "time");
 
         let author = {};
-        let authorElem = metadata.querySelector('author');
+        let authorElem = this.metadata.querySelector('author');
         if(authorElem != null){
             author.name = this.getElementValue(authorElem, "name");
             author.email  = {};
@@ -52,7 +52,7 @@ gpxParser.prototype.parse = function (gpxstring) {
         this.metadata.author = author;
 
         let link = {};
-        let linkElem = this.queryDirectSelector(metadata, 'link');
+        let linkElem = this.queryDirectSelector(this.metadata, 'link');
         if(linkElem != null){
             link.href = linkElem.getAttribute('href');
             link.text = this.getElementValue(linkElem, "text");
