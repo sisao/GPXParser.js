@@ -244,7 +244,32 @@ gpxParser.prototype.calcDistanceBetween = function (wpt1, wpt2) {
             a = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon,
             c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 	return 6371000 * c;
-}
+};
+
+/**
+ * Calculate elevation for sections with a given length from array of points 
+ * 
+ * @param  {} points - An array of points with lat and lon properties
+ * @param  {} sectionLength - length of track sections
+ * 
+ * @returns {[{"elevation" : ElevationObject, "distance": DistanceObject}]} array of sections with elevation and distance objects
+ */
+gpxParser.prototype.calcSections = function (points, sectionLength) {
+    let sections = [];
+    let section = [];
+    let sectionElevation;
+    for (let i = 0; i < points.length - 1; i++) {
+        let distance = this.calculDistance(section);
+        if(distance.total >= sectionLength) {
+            sectionElevation = this.calcElevation(section); 
+            sections.push({"elevation" : sectionElevation, "distance": distance});
+            section = [];            
+        }
+        section.push(points[i]);              
+    }
+    return sections;
+
+};
 
 /**
  * Generate Elevation Object from an array of points
