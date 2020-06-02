@@ -139,7 +139,7 @@ gpxParser.prototype.parse = function (gpxstring) {
 
         let trackpoints = [];
         var trkpts = [].slice.call(trk.querySelectorAll('trkpt'));
-	    for (let idxIn in trkpts){
+        for (let idxIn in trkpts){
             var trkpt = trkpts[idxIn];
             let pt = {};
             pt.lat = parseFloat(trkpt.getAttribute("lat"));
@@ -188,8 +188,8 @@ gpxParser.prototype.queryDirectSelector = function(parent, needle) {
     if(elements.length > 1) {
         let directChilds = parent.childNodes;
 
-        for(idx in directChilds) {
-            elem = directChilds[idx];
+        for(let idx in directChilds) {
+            let elem = directChilds[idx];
             if(elem.tagName === needle) {
                 finalElem = elem;
             }
@@ -237,12 +237,12 @@ gpxParser.prototype.calcDistanceBetween = function (wpt1, wpt2) {
     latlng2.lat = wpt2.lat;
     latlng2.lon = wpt2.lon;
     var rad = Math.PI / 180,
-		    lat1 = latlng1.lat * rad,
-		    lat2 = latlng2.lat * rad,
-		    sinDLat = Math.sin((latlng2.lat - latlng1.lat) * rad / 2),
-		    sinDLon = Math.sin((latlng2.lon - latlng1.lon) * rad / 2),
-		    a = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon,
-		    c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            lat1 = latlng1.lat * rad,
+            lat2 = latlng2.lat * rad,
+            sinDLat = Math.sin((latlng2.lat - latlng1.lat) * rad / 2),
+            sinDLon = Math.sin((latlng2.lon - latlng1.lon) * rad / 2),
+            a = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon,
+            c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 	return 6371000 * c;
 }
 
@@ -271,16 +271,16 @@ gpxParser.prototype.calcElevation = function (points) {
     var elevation = [];
     var sum = 0;
 
-    for (var i = 0, len = points.length; i < len; i++) {
-        var ele = parseFloat(points[i].ele);
+    for (var j = 0, len = points.length; j < len; j++) {
+        var ele = parseFloat(points[j].ele).toFixed(2);
         elevation.push(ele);
         sum += ele;
     }
 
-    ret.max = Math.max.apply(null, elevation) || null;
-    ret.min = Math.min.apply(null, elevation) || null;
-    ret.pos = Math.abs(dp) || null;
-    ret.neg = Math.abs(dm) || null;
+    ret.max = Math.max.apply(null, elevation).toFixed(2) || null;
+    ret.min = Math.min.apply(null, elevation).toFixed(2) || null;
+    ret.pos = Math.abs(dp).toFixed(2) || null;
+    ret.neg = Math.abs(dm).toFixed(2) || null;
     ret.avg = sum / elevation.length || null;
 
     return ret;
@@ -304,10 +304,10 @@ gpxParser.prototype.toGeoJSON = function () {
         },
     };
 
-    for(idx in this.tracks) {
+    for(let idx in this.tracks) {
         let track = this.tracks[idx];
 
-        var feature = {
+        let feature = {
             "type": "Feature",
             "geometry": {
                 "type": "LineString",
@@ -328,7 +328,7 @@ gpxParser.prototype.toGeoJSON = function () {
         for(idx in track.points) {
             let pt = track.points[idx];
         
-            var geoPt = [];
+            let geoPt = [];
             geoPt.push(pt.lon);
             geoPt.push(pt.lat);
             geoPt.push(pt.ele);
@@ -339,10 +339,10 @@ gpxParser.prototype.toGeoJSON = function () {
         GeoJSON.features.push(feature);
     }
 
-    for(idx in this.routes) {
+    for(let idx in this.routes) {
         let track = this.routes[idx];
 
-        var feature = {
+        let feature = {
             "type": "Feature",
             "geometry": {
                 "type": "LineString",
@@ -364,7 +364,7 @@ gpxParser.prototype.toGeoJSON = function () {
         for(idx in track.points) {
             let pt = track.points[idx];
         
-            var geoPt = [];
+            let geoPt = [];
             geoPt.push(pt.lon);
             geoPt.push(pt.lat);
             geoPt.push(pt.ele);
@@ -375,7 +375,7 @@ gpxParser.prototype.toGeoJSON = function () {
         GeoJSON.features.push(feature);
     }
 
-    for(idx in this.waypoints) {
+    for(let idx in this.waypoints) {
         let pt = this.waypoints[idx];
     
         var feature = {
