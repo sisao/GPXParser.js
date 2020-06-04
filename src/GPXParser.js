@@ -9,6 +9,8 @@ const gpxParser = function () {
     this.waypoints = [];
     this.tracks    = [];
     this.routes    = [];
+    this.sections  = [];
+    this.config    = {};
 };
 
 /**
@@ -16,12 +18,17 @@ const gpxParser = function () {
  * 
  * @param {string} gpxstring - A GPX formatted String
  * 
+ * @param {Options} options (optional) - A options object
+ * 
  * @return {gpxParser} A GPXParser object
  */
-gpxParser.prototype.parse = function (gpxstring) {
+gpxParser.prototype.parse = function (gpxstring, options) {
     let defaultParameters =  {
         calculateSections: false,
         sectionLength: 100,
+        precision: 17,
+    };
+    this.config = Object.assign({}, defaultParameters, options);
 
     const keepThis = this;
     const domParser = new window.DOMParser();
@@ -155,6 +162,11 @@ gpxParser.prototype.parse = function (gpxstring) {
         track.points = trackpoints;
 
         keepThis.tracks.push(track);
+
+        if(this.config.calculateSections && trackpoints !== null && trackpoints.length > 0) {
+            let trackSections = keepThis.calcSections(trackpoints, this.config.sectionLength);
+            this.sections.push(trackSections);
+        }        
     }
 };
 
@@ -215,11 +227,11 @@ gpxParser.prototype.calculDistance = function(points) {
     let cumulDistance = [];
     for (let i = 0; i < points.length - 1; i++) {
         totalDistance += this.calcDistanceBetween(points[i],points[i+1]);
-        cumulDistance[i] = totalDistance;
+        cumulDistance[i] = totalDistance.toFixed(this.config.precision);
     }
-    cumulDistance[points.length - 1] = totalDistance;
+    cumulDistance[points.length - 1] = totalDistance.toFixed(this.config.precision);
 
-    distance.total = totalDistance;
+    distance.total = totalDistance.toFixed(this.config.precision);
     distance.cumul = cumulDistance;
 
     return distance;
@@ -255,7 +267,7 @@ gpxParser.prototype.calcDistanceBetween = function (wpt1, wpt2) {
  * @param  {} points - An array of points with lat and lon properties
  * @param  {} sectionLength - length of track sections
  * 
- * @returns {[{"elevation" : ElevationObject, "distance": DistanceObject}]} array of sections with elevation and distance objects
+ * @returns {[{"elevation" : ElevationObject, "distance": DistanceObject}, ...]} array of sections with elevation and distance objects
  */
 gpxParser.prototype.calcSections = function (points, sectionLength) {
     let sections = [];
@@ -287,7 +299,7 @@ gpxParser.prototype.calcElevation = function (points) {
         ret = {};
 
     for (let i = 0; i < points.length - 1; i++) {
-        var diff = parseFloat(points[i + 1].ele) - parseFloat(points[i].ele);
+        let diff = parseFloat(points[i + 1].ele) - parseFloat(points[i].ele);
 
         if (diff < 0) {
             dm += diff;
@@ -300,16 +312,16 @@ gpxParser.prototype.calcElevation = function (points) {
     let sum = 0;
 
     for (let j = 0, len = points.length; j < len; j++) {
-        var ele = parseFloat(points[j].ele).toFixed(2);
+        let ele = parseFloat(points[j].ele).toFixed(this.config.precision);
         elevation.push(ele);
-        sum += ele;
+        sum += parseFloat(ele);
     }
 
-    ret.max = Math.max.apply(null, elevation).toFixed(2) || null;
-    ret.min = Math.min.apply(null, elevation).toFixed(2) || null;
-    ret.pos = Math.abs(dp).toFixed(2) || null;
-    ret.neg = Math.abs(dm).toFixed(2) || null;
-    ret.avg = sum / elevation.length || null;
+    ret.max = Math.max.apply(null, elevation).toFixed(this.config.precision) || null;
+    ret.min = Math.min.apply(null, elevation).toFixed(this.config.precision) || null;
+    ret.pos = Math.abs(dp).toFixed(this.config.precision) || null;
+    ret.neg = Math.abs(dm).toFixed(this.config.precision) || null;
+    ret.avg = (sum / elevation.length).toFixed(this.config.precision) || null;
 
     return ret;
 };
