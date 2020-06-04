@@ -3,7 +3,7 @@
  * 
  * @constructor
  */
-var gpxParser = function () {
+const gpxParser = function () {
     this.xmlSource = "";
     this.metadata  = {};
     this.waypoints = [];
@@ -19,28 +19,31 @@ var gpxParser = function () {
  * @return {gpxParser} A GPXParser object
  */
 gpxParser.prototype.parse = function (gpxstring) {
-    var keepThis = this;
-    var domParser = new window.DOMParser();
-    this.xmlSource = domParser.parseFromString(gpxstring, 'text/xml');
+    let defaultParameters =  {
+        calculateSections: false,
+        sectionLength: 100,
 
-    this.metadata = this.xmlSource.querySelector('metadata');
+    const keepThis = this;
+    const domParser = new window.DOMParser();
+    this.xmlSource = domParser.parseFromString(gpxstring, 'text/xml');
+    let parsedMetadata = this.xmlSource.querySelector('metadata');
     if(this.metadata != null){
-        this.metadata.name  = this.getElementValue(this.metadata, "name");
-        this.metadata.desc  = this.getElementValue(this.metadata, "desc");
-        this.metadata.time  = this.getElementValue(this.metadata, "time");
+        this.metadata.name  = this.getElementValue(parsedMetadata, "name");
+        this.metadata.desc  = this.getElementValue(parsedMetadata, "desc");
+        this.metadata.time  = this.getElementValue(parsedMetadata, "time");
 
         let author = {};
-        let authorElem = this.metadata.querySelector('author');
+        let authorElem = parsedMetadata.querySelector('author');
         if(authorElem != null){
             author.name = this.getElementValue(authorElem, "name");
-            author.email  = {};
+            author.email = {};
             let emailElem = authorElem.querySelector('email');
             if(emailElem != null){
                 author.email.id     = emailElem.getAttribute("id");
                 author.email.domain = emailElem.getAttribute("domain");
             }
 
-            let link     = {};
+            let link = {};
             let linkElem = authorElem.querySelector('link');
             if(linkElem != null){
                 link.href = linkElem.getAttribute('href');
@@ -52,7 +55,7 @@ gpxParser.prototype.parse = function (gpxstring) {
         this.metadata.author = author;
 
         let link = {};
-        let linkElem = this.queryDirectSelector(this.metadata, 'link');
+        let linkElem = this.queryDirectSelector(parsedMetadata, 'link');
         if(linkElem != null){
             link.href = linkElem.getAttribute('href');
             link.text = this.getElementValue(linkElem, "text");
@@ -61,9 +64,9 @@ gpxParser.prototype.parse = function (gpxstring) {
         }
     }
 
-    var wpts = [].slice.call(this.xmlSource.querySelectorAll('wpt'));
+    let wpts = [].slice.call(this.xmlSource.querySelectorAll('wpt'));
     for (let idx in wpts){
-        var wpt = wpts[idx];
+        let wpt = wpts[idx];
         let pt  = {};
         pt.name = keepThis.getElementValue(wpt, "name")
         pt.lat  = parseFloat(wpt.getAttribute("lat"));
@@ -74,9 +77,9 @@ gpxParser.prototype.parse = function (gpxstring) {
         keepThis.waypoints.push(pt);
     }
 
-    var rtes = [].slice.call(this.xmlSource.querySelectorAll('rte'));
+    let rtes = [].slice.call(this.xmlSource.querySelectorAll('rte'));
     for (let idx in rtes){
-        var rte = rtes[idx];
+        let rte = rtes[idx];
         let route = {};
         route.name   = keepThis.getElementValue(rte, "name");
         route.cmt    = keepThis.getElementValue(rte, "cmt");
@@ -97,10 +100,10 @@ gpxParser.prototype.parse = function (gpxstring) {
         route.link = link;
 
         let routepoints = [];
-        var rtepts = [].slice.call(rte.querySelectorAll('rtept'));
+        let rtepts = [].slice.call(rte.querySelectorAll('rtept'));
 
         for (let idxIn in rtepts){
-            var rtept = rtepts[idxIn];
+            let rtept = rtepts[idxIn];
             let pt    = {};
             pt.lat    = parseFloat(rtept.getAttribute("lat"));
             pt.lon    = parseFloat(rtept.getAttribute("lon"));
@@ -114,9 +117,9 @@ gpxParser.prototype.parse = function (gpxstring) {
         keepThis.routes.push(route);
     }
 
-    var trks = [].slice.call(this.xmlSource.querySelectorAll('trk'));
+    let trks = [].slice.call(this.xmlSource.querySelectorAll('trk'));
     for (let idx in trks){
-        var trk = trks[idx];
+        let trk = trks[idx];
         let track = {};
 
         track.name   = keepThis.getElementValue(trk, "name");
@@ -138,9 +141,9 @@ gpxParser.prototype.parse = function (gpxstring) {
         track.link = link;
 
         let trackpoints = [];
-        var trkpts = [].slice.call(trk.querySelectorAll('trkpt'));
+        let trkpts = [].slice.call(trk.querySelectorAll('trkpt'));
         for (let idxIn in trkpts){
-            var trkpt = trkpts[idxIn];
+            let trkpt = trkpts[idxIn];
             let pt = {};
             pt.lat = parseFloat(trkpt.getAttribute("lat"));
             pt.lon = parseFloat(trkpt.getAttribute("lon"));
@@ -166,7 +169,7 @@ gpxParser.prototype.parse = function (gpxstring) {
 gpxParser.prototype.getElementValue = function(parent, needle){
     let elem = parent.querySelector(needle);
     if(elem != null){
-        return elem.innerHTML != undefined ? elem.innerHTML : elem.childNodes[0].data;
+        return elem.innerHTML !== undefined ? elem.innerHTML : elem.childNodes[0].data;
     }
     return elem;
 }
@@ -210,7 +213,7 @@ gpxParser.prototype.calculDistance = function(points) {
     let distance = {};
     let totalDistance = 0;
     let cumulDistance = [];
-    for (var i = 0; i < points.length - 1; i++) {
+    for (let i = 0; i < points.length - 1; i++) {
         totalDistance += this.calcDistanceBetween(points[i],points[i+1]);
         cumulDistance[i] = totalDistance;
     }
@@ -236,7 +239,7 @@ gpxParser.prototype.calcDistanceBetween = function (wpt1, wpt2) {
     let latlng2 = {};
     latlng2.lat = wpt2.lat;
     latlng2.lon = wpt2.lon;
-    var rad = Math.PI / 180,
+    let rad = Math.PI / 180,
             lat1 = latlng1.lat * rad,
             lat2 = latlng2.lat * rad,
             sinDLat = Math.sin((latlng2.lat - latlng1.lat) * rad / 2),
@@ -279,11 +282,11 @@ gpxParser.prototype.calcSections = function (points, sectionLength) {
  * @returns {ElevationObject} An object with negative and positive height difference and average, max and min altitude data
  */
 gpxParser.prototype.calcElevation = function (points) {
-    var dp = 0,
+    let dp = 0,
         dm = 0,
         ret = {};
 
-    for (var i = 0; i < points.length - 1; i++) {
+    for (let i = 0; i < points.length - 1; i++) {
         var diff = parseFloat(points[i + 1].ele) - parseFloat(points[i].ele);
 
         if (diff < 0) {
@@ -293,10 +296,10 @@ gpxParser.prototype.calcElevation = function (points) {
         }
     }
 
-    var elevation = [];
-    var sum = 0;
+    let elevation = [];
+    let sum = 0;
 
-    for (var j = 0, len = points.length; j < len; j++) {
+    for (let j = 0, len = points.length; j < len; j++) {
         var ele = parseFloat(points[j].ele).toFixed(2);
         elevation.push(ele);
         sum += ele;
@@ -317,7 +320,7 @@ gpxParser.prototype.calcElevation = function (points) {
  * @returns {} a GeoJSON formatted Object
  */
 gpxParser.prototype.toGeoJSON = function () {
-    var GeoJSON = {
+    let GeoJSON = {
         "type": "FeatureCollection",
         "features": [],
         "properties": {
@@ -403,7 +406,7 @@ gpxParser.prototype.toGeoJSON = function () {
     for(let idx in this.waypoints) {
         let pt = this.waypoints[idx];
     
-        var feature = {
+        let feature = {
             "type": "Feature",
             "geometry": {
                 "type": "Point",
