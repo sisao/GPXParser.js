@@ -2,7 +2,7 @@
   "name": "gpxparser",
   "version": "3.0.5",
   "description": "GPX file parser",
-  "main": "dist/GPXParser.min.js",
+  "main": "build/GPXParser.js",
   "scripts": {
     "test": "nyc mocha"
   },
@@ -23,18 +23,20 @@
     "url": "https://github.com/Luuka/GPXParser.js/issues"
   },
   "homepage": "https://github.com/Luuka/GPXParser.js#readme",
-  "dependencies": {
-    "jsdom": "^15.2.1",
-    "jsdom-global": "^3.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@types/jsdom-global": "^3.0.2",
+    "eslint": "^7.1.0",
     "gulp": "^4.0.2",
     "gulp-jsdoc3": "^2.0.0",
     "gulp-minify": "^3.1.0",
     "gulp-mocha": "^7.0.2",
     "jsdoc": "^3.6.3",
-    "jsdom": "^15.2.1",
+    "jsdom": "15.2.1",
+    "jsdom-global": "3.0.2",
     "mocha": "^6.2.2",
-    "nyc": "^15.0.0"
+    "nyc": "^15.0.0",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.3"
   }
 }

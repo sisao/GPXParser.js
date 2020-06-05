@@ -1,4 +1,4 @@
-var gpxParser = require('../src/GPXParser.js');
+const gpxParser = require('../build/src/GPXParser.js');
 var fs = require('fs');
 var assert = require('assert');
 require('jsdom-global')();
@@ -16,6 +16,7 @@ describe('Parser object', function () {
     });
 });
 
+/*
 describe('GPX parser with options', function () {
     let gpxDemo = fs.readFileSync('./test/sampleData.gpx', 'utf8');
 
@@ -44,6 +45,7 @@ describe('GPX parser with options', function () {
     });
 
 });
+*/
 
 describe('GPX parser', function () {
     let gpxDemo = fs.readFileSync('./test/sampleData.gpx', 'utf8');
